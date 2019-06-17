@@ -51,8 +51,10 @@ def read_data_from_file(filename):
 
 
 def create_dictionary_word_usage(selected_source, selected_target):
-    # Create a dictionary for the frequency of the vocabulary
+    # Create a dictionary for the frequency of the vocabulary (根据输入输出数据创建字典)
+    
     vocab = {}
+    #把数据中每一行拆分成单独的词，查看每个词是否在字典中，若不在则他的数量加1，若在则它的数目不变
     for source in selected_source:
         for word in source.split():
             if word not in vocab:
