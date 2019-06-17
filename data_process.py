@@ -120,6 +120,47 @@ def sort_text_based_on_number_of_words(sources, targets, max_line_length):
     return sorted_sources, sorted_targets
 
 
+def clean_text(text):
+    '''Clean text by removing unnecessary characters and altering the format of words.'''
+
+    text = text.lower()
+
+    text = re.sub(r"i'm", "i am", text)
+    text = re.sub(r"he's", "he is", text)
+    text = re.sub(r"she's", "she is", text)
+    text = re.sub(r"it's", "it is", text)
+    text = re.sub(r"that's", "that is", text)
+    text = re.sub(r"what's", "that is", text)
+    text = re.sub(r"where's", "where is", text)
+    text = re.sub(r"how's", "how is", text)
+    text = re.sub(r"\'ll", " will", text)
+    text = re.sub(r"\'ve", " have", text)
+    text = re.sub(r"\'re", " are", text)
+    text = re.sub(r"\'d", " would", text)
+    text = re.sub(r"\'re", " are", text)
+    text = re.sub(r"won't", "will not", text)
+    text = re.sub(r"can't", "cannot", text)
+    text = re.sub(r"n't", " not", text)
+    text = re.sub(r"n'", "ng", text)
+    text = re.sub(r"'bout", "about", text)
+    text = re.sub(r"'til", "until", text)
+    text = re.sub(r"temme", "tell me", text)
+    text = re.sub(r"gimme", "give me", text)
+    text = re.sub(r"howz", "how is", text)
+    text = re.sub(r"let's", "let us", text)
+    text = re.sub(r" & ", " and ", text)
+    text = re.sub(r"[-()\"#[\]/@;:<>{}`*_+=&~|.!/?,]", "", text)
+
+    return text
+
+def clean_sentence(sentences):
+    cleaned_sentences = []
+    for sentence in sentences:
+        sentence = clean_text(sentence)
+        cleaned_sentences.append(sentence)
+    return cleaned_sentences
+
+
 def main_prepare_data():
     doc = load_doc(FILE_PATH)
 
@@ -156,48 +197,6 @@ def main_prepare_data():
 
     write_lines_to_file("process_data/english_final", sorted_sources)
     write_lines_to_file("process_data/german_final", sorted_targets)
-
-
-def clean_sentence(sentences):
-    cleaned_sentences = []
-    for sentence in sentences:
-        sentence = clean_text(sentence)
-        cleaned_sentences.append(sentence)
-    return cleaned_sentences
-
-
-def clean_text(text):
-    '''Clean text by removing unnecessary characters and altering the format of words.'''
-
-    text = text.lower()
-
-    text = re.sub(r"i'm", "i am", text)
-    text = re.sub(r"he's", "he is", text)
-    text = re.sub(r"she's", "she is", text)
-    text = re.sub(r"it's", "it is", text)
-    text = re.sub(r"that's", "that is", text)
-    text = re.sub(r"what's", "that is", text)
-    text = re.sub(r"where's", "where is", text)
-    text = re.sub(r"how's", "how is", text)
-    text = re.sub(r"\'ll", " will", text)
-    text = re.sub(r"\'ve", " have", text)
-    text = re.sub(r"\'re", " are", text)
-    text = re.sub(r"\'d", " would", text)
-    text = re.sub(r"\'re", " are", text)
-    text = re.sub(r"won't", "will not", text)
-    text = re.sub(r"can't", "cannot", text)
-    text = re.sub(r"n't", " not", text)
-    text = re.sub(r"n'", "ng", text)
-    text = re.sub(r"'bout", "about", text)
-    text = re.sub(r"'til", "until", text)
-    text = re.sub(r"temme", "tell me", text)
-    text = re.sub(r"gimme", "give me", text)
-    text = re.sub(r"howz", "how is", text)
-    text = re.sub(r"let's", "let us", text)
-    text = re.sub(r" & ", " and ", text)
-    text = re.sub(r"[-()\"#[\]/@;:<>{}`*_+=&~|.!/?,]", "", text)
-
-    return text
 
 
 def create_source_target_file_from_reddit_main_file(pairs, source_file, target_file, min_words, max_words):
