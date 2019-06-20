@@ -162,6 +162,27 @@ def clean_sentence(sentences):
     return cleaned_sentences
 
 
+def create_source_target_file_from_reddit_main_file(pairs, source_file, target_file, min_words, max_words):
+    source_file = open(source_file, 'w', newline='\n', encoding='utf-8')
+    target_file = open(target_file, 'w', newline='\n', encoding='utf-8')
+    number_of_samples = 0
+    for line in pairs:
+        number_of_words_source = len(line[0])
+        number_of_words_target = len(line[1])
+        if (number_of_words_source >= min_words and number_of_words_source <= max_words
+                and number_of_words_target >= min_words and number_of_words_target <= max_words):
+            source_file.write(line[0])
+            source_file.write('\n')
+            target_file.write(line[1])
+            target_file.write('\n')
+            number_of_samples += 1
+
+    source_file.close()
+    target_file.close()
+    return number_of_samples
+
+
+
 def main_prepare_data():
     doc = load_doc(FILE_PATH)
 
@@ -199,25 +220,6 @@ def main_prepare_data():
     write_lines_to_file("process_data/english_final", sorted_sources)
     write_lines_to_file("process_data/german_final", sorted_targets)
 
-
-def create_source_target_file_from_reddit_main_file(pairs, source_file, target_file, min_words, max_words):
-    source_file = open(source_file, 'w', newline='\n', encoding='utf-8')
-    target_file = open(target_file, 'w', newline='\n', encoding='utf-8')
-    number_of_samples = 0
-    for line in pairs:
-        number_of_words_source = len(line[0])
-        number_of_words_target = len(line[1])
-        if (number_of_words_source >= min_words and number_of_words_source <= max_words
-                and number_of_words_target >= min_words and number_of_words_target <= max_words):
-            source_file.write(line[0])
-            source_file.write('\n')
-            target_file.write(line[1])
-            target_file.write('\n')
-            number_of_samples += 1
-
-    source_file.close()
-    target_file.close()
-    return number_of_samples
 
 
 main_prepare_data()
