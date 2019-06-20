@@ -14,6 +14,11 @@ def load_doc(filename):
     return text
 
 
+def read_data_from_file(filename):
+    lines = open(filename).read().split('\n')
+    return lines
+
+
 def to_pairs(doc):
     lines = doc.strip().split('\n')
     pairs = [line.split('\t') for line in lines]
@@ -44,10 +49,6 @@ min_line_length = 2  # Minimum number of words required to be in training
 max_line_length = 30  # Minimum number of words allowed to be in training
 frequency_of_word = 1  # minumum number of word count usages
 
-
-def read_data_from_file(filename):
-    lines = open(filename).read().split('\n')
-    return lines
 
 
 def create_dictionary_word_usage(selected_source, selected_target):
