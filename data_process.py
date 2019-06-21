@@ -6,25 +6,45 @@ from numpy.ma import array
 
 FILE_PATH = 'raw_data/deu.txt'
 
-
+# 1
 def load_doc(filename):
     file = open(filename, mode='rt', encoding='utf-8')
     text = file.read()
     file.close()
     return text
 
-
-def read_data_from_file(filename):
-    lines = open(filename).read().split('\n')
-    return lines
-
-
+# 2
 def to_pairs(doc):
     lines = doc.strip().split('\n')
     pairs = [line.split('\t') for line in lines]
     return pairs
 
+# 3
+def create_source_target_file_from_reddit_main_file(pairs, source_file, target_file, min_words, max_words):
+    source_file = open(source_file, 'w', newline='\n', encoding='utf-8')
+    target_file = open(target_file, 'w', newline='\n', encoding='utf-8')
+    number_of_samples = 0
+    for line in pairs:
+        number_of_words_source = len(line[0])
+        number_of_words_target = len(line[1])
+        if (number_of_words_source >= min_words and number_of_words_source <= max_words
+                and number_of_words_target >= min_words and number_of_words_target <= max_words):
+            source_file.write(line[0])
+            source_file.write('\n')
+            target_file.write(line[1])
+            target_file.write('\n')
+            number_of_samples += 1
 
+    source_file.close()
+    target_file.close()
+    return number_of_samples
+
+# 4
+def read_data_from_file(filename):
+    lines = open(filename).read().split('\n')
+    return lines
+
+# ??
 def clean_pairs(lines):
     cleaned = list()
     re_print = re.compile('[^%s]' % re.escape(string.printable))
@@ -44,83 +64,7 @@ def clean_pairs(lines):
         cleaned.append(clean_pair)
     return array(cleaned)
 
-
-min_line_length = 2  # Minimum number of words required to be in training
-max_line_length = 30  # Minimum number of words allowed to be in training
-frequency_of_word = 1  # minumum number of word count usages
-
-
-
-def create_dictionary_word_usage(selected_source, selected_target):
-    # Create a dictionary for the frequency of the vocabulary (根据输入输出数据创建字典)
-    
-    vocab = {}
-    #把数据中每一行拆分成单独的词，查看每个词是否在字典中，若不在则他的数量加1，若在则它的数目不变
-    for source in selected_source:
-        for word in source.split():
-            if word not in vocab:
-                vocab[word] = 1
-            else:
-                vocab[word] += 1
-
-    for target in selected_target:
-        for word in target.split():
-            if word not in vocab:
-                vocab[word] = 1
-            else:
-                vocab[word] += 1
-    return vocab
-
-
-def vocab_from_word_to_emb_without_rare_word(dict_word_usage, min_number_of_usage):
-    vocab_words_to_int = {}
-
-    vocab_words_to_int['<GO>'] = 0
-    vocab_words_to_int['<EOS>'] = 1
-    vocab_words_to_int['<UNK>'] = 2
-    vocab_words_to_int['<PAD>'] = 3
-
-    word_num = 4
-    for word, count in dict_word_usage.items():
-        # maximum number of characters allowed in a word
-        if len(word) <= 20:
-            if count >= min_number_of_usage:
-                vocab_words_to_int[word] = word_num
-                word_num += 1
-
-    return vocab_words_to_int
-
-
-def write_lines_to_file(filename, list_of_lines):
-    with open(filename, 'w') as file_to_write:
-        for i in range(len(list_of_lines)):
-            file_to_write.write(list_of_lines[i] + "\n")
-
-
-def write_dict_to_file(dict_to_write, file_to_write):
-    with open(file_to_write, 'w') as file_to:
-        for key, val in dict_to_write.items():
-            file_to.write(str(key) + "=" + str(val) + "\n")
-
-
-def sort_text_based_on_number_of_words(sources, targets, max_line_length):
-    # Sort sources and targets by the length of sources.
-    # This will reduce the amount of padding during training
-    # Which should speed up training and help to reduce the loss
-
-    sorted_sources = []
-    sorted_targets = []
-
-    for length in range(min_line_length, max_line_length):
-        for i, ques in enumerate(sources):
-            ques_tmp = ques.split(" ")
-            if len(ques_tmp) == length:
-                sorted_sources.append(sources[i])
-                sorted_targets.append(targets[i])
-
-    return sorted_sources, sorted_targets
-
-
+# 5
 def clean_text(text):
     '''Clean text by removing unnecessary characters and altering the format of words.'''
 
@@ -161,26 +105,80 @@ def clean_sentence(sentences):
         cleaned_sentences.append(sentence)
     return cleaned_sentences
 
+# 6
+def create_dictionary_word_usage(selected_source, selected_target):
+    # Create a dictionary for the frequency of the vocabulary (根据输入输出数据创建字典)
+    
+    vocab = {}
+    #把数据中每一行拆分成单独的词，查看每个词是否在字典中，若不在则他的数量加1，若在则它的数目不变
+    for source in selected_source:
+        for word in source.split():
+            if word not in vocab:
+                vocab[word] = 1
+            else:
+                vocab[word] += 1
 
-def create_source_target_file_from_reddit_main_file(pairs, source_file, target_file, min_words, max_words):
-    source_file = open(source_file, 'w', newline='\n', encoding='utf-8')
-    target_file = open(target_file, 'w', newline='\n', encoding='utf-8')
-    number_of_samples = 0
-    for line in pairs:
-        number_of_words_source = len(line[0])
-        number_of_words_target = len(line[1])
-        if (number_of_words_source >= min_words and number_of_words_source <= max_words
-                and number_of_words_target >= min_words and number_of_words_target <= max_words):
-            source_file.write(line[0])
-            source_file.write('\n')
-            target_file.write(line[1])
-            target_file.write('\n')
-            number_of_samples += 1
+    for target in selected_target:
+        for word in target.split():
+            if word not in vocab:
+                vocab[word] = 1
+            else:
+                vocab[word] += 1
+    return vocab
 
-    source_file.close()
-    target_file.close()
-    return number_of_samples
+# 7
+def vocab_from_word_to_emb_without_rare_word(dict_word_usage, min_number_of_usage):
+    vocab_words_to_int = {}
 
+    vocab_words_to_int['<GO>'] = 0
+    vocab_words_to_int['<EOS>'] = 1
+    vocab_words_to_int['<UNK>'] = 2
+    vocab_words_to_int['<PAD>'] = 3
+
+    word_num = 4
+    for word, count in dict_word_usage.items():
+        # maximum number of characters allowed in a word
+        if len(word) <= 20:
+            if count >= min_number_of_usage:
+                vocab_words_to_int[word] = word_num
+                word_num += 1
+
+    return vocab_words_to_int
+
+# 8
+def write_dict_to_file(dict_to_write, file_to_write):
+    with open(file_to_write, 'w') as file_to:
+        for key, val in dict_to_write.items():
+            file_to.write(str(key) + "=" + str(val) + "\n")
+
+# 9
+def sort_text_based_on_number_of_words(sources, targets, max_line_length):
+    # Sort sources and targets by the length of sources.
+    # This will reduce the amount of padding during training
+    # Which should speed up training and help to reduce the loss
+
+    sorted_sources = []
+    sorted_targets = []
+
+    for length in range(min_line_length, max_line_length):
+        for i, ques in enumerate(sources):
+            ques_tmp = ques.split(" ")
+            if len(ques_tmp) == length:
+                sorted_sources.append(sources[i])
+                sorted_targets.append(targets[i])
+
+    return sorted_sources, sorted_targets
+
+# 10            
+def write_lines_to_file(filename, list_of_lines):
+    with open(filename, 'w') as file_to_write:
+        for i in range(len(list_of_lines)):
+            file_to_write.write(list_of_lines[i] + "\n")
+
+
+min_line_length = 2  # Minimum number of words required to be in training
+max_line_length = 30  # Minimum number of words allowed to be in training
+frequency_of_word = 1  # minumum number of word count usages
 
 
 def main_prepare_data():
